@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency("actionmailer", ">= 4.0", "< 6")
   s.add_dependency("activesupport", ">= 4.0", "< 6")
+  s.add_dependency("addressable")
 
   s.add_development_dependency "rails", ">= 4.0", "< 6"
   s.add_development_dependency "resque", "~> 1.2.0"
