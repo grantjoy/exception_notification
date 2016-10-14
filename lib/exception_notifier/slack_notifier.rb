@@ -29,8 +29,19 @@ module ExceptionNotifier
         data = (env['exception_notifier.exception_data'] || {}).merge(options[:data] || {})
 
         kontroller = env['action_controller.instance']
-        request = "#{env['REQUEST_METHOD']} <#{env['REQUEST_URI']}>"
-        text = "#{exception_name} *occurred while* `#{env['REQUEST_METHOD']} <#{env['REQUEST_URI']}>`"
+        request_uri = env['REQUEST_URI']
+        if env['REQUEST_METHOD'] == 'GET'
+          uri = Addressable::URI.parse(request_uri)
+          sanitized_params = {}
+          uri.query_values.each do |field, value|
+            value = 'FILTERED' if Rails.application.config.filter_parameters.include? field.to_sym
+            sanitized_params[field] = value
+          end
+          uri.query_values = sanitized_params
+          request_uri = uri.to_s
+        end
+
+        text = "#{exception_name} *occurred while* `#{env['REQUEST_METHOD']} <#{request_uri}>`"
         text += " *was processed by* `#{kontroller.controller_name}##{kontroller.action_name}`" if kontroller
         text += "\n"
       end
