@@ -33,9 +33,11 @@ module ExceptionNotifier
         if env['REQUEST_METHOD'] == 'GET'
           uri = Addressable::URI.parse(request_uri)
           sanitized_params = {}
-          uri.query_values.each do |field, value|
-            value = 'FILTERED' if Rails.application.config.filter_parameters.include? field.to_sym
-            sanitized_params[field] = value
+          unless uri.query_values.empty?
+            uri.query_values.each do |field, value|
+              value = 'FILTERED' if Rails.application.config.filter_parameters.include? field.to_sym
+              sanitized_params[field] = value
+            end
           end
           uri.query_values = sanitized_params
           request_uri = uri.to_s
